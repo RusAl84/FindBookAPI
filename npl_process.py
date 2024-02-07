@@ -1,7 +1,7 @@
 ﻿import os
 import json
 import nltk
-import pymorphy2
+import pymorphy3
 
 
 def remove_digit(data):
@@ -64,7 +64,7 @@ def remove_all(data):
     return data
 
 def get_normal_form_mas(words):
-    morph = pymorphy2.MorphAnalyzer()
+    morph = pymorphy3.MorphAnalyzer()
     result = []
     for word in words.split():
         p = morph.parse(word)[0]
@@ -73,7 +73,7 @@ def get_normal_form_mas(words):
 
 
 def get_normal_form(words):
-    morph = pymorphy2.MorphAnalyzer()
+    morph = pymorphy3.MorphAnalyzer()
     p = morph.parse(words)[0]
     return p.normal_form
 
@@ -84,12 +84,23 @@ def remove_paragraf_and_toLower(text):
     return text
 
 
+def get_keywords(data):
+    data=remove_all(data)
+    mas=[]
+    morph = pymorphy3.MorphAnalyzer()
+    for word in data.split():
+        p = morph.parse(word)[0]
+        mas.append(p.normal_form)
+    return mas
+
 def nltk_download():
     nltk.download('stopwords')
     nltk.download('punkt')
     
 
 if __name__ == '__main__':
-    nltk_download()
-
+    # nltk_download()
+    str1="Роман-антиутопия рассказывает нам о том, как к 1984 году, в результате войн и политических кризисов на планете Земля, образовались три тоталитарных сверхдержавы: Океания, Евразия и Остазия – которые непрерывно воюют друг с другом. Действие происходит в будущем тоталитарном обществе, где правительство во главе с Большим Братом полностью контролирует все аспекты жизни граждан. Главный герой работает в Министерстве правды и начинает восставать против деспотичного режима правительства, но в итоге сталкивается с серьёзными последствиями своих действий."
+    data = get_keywords(str1)
+    print(data)
 
