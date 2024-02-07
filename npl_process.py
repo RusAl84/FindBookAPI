@@ -4,6 +4,10 @@ import nltk
 import pymorphy3
 
 
+db_fileName_data = "./data.txt"
+db_fileName = "./data.json"
+
+
 def remove_digit(data):
     str2 = ''
     for c in data:
@@ -97,10 +101,67 @@ def nltk_download():
     nltk.download('stopwords')
     nltk.download('punkt')
     
+    
+def calc_intersection_list(list1, list2):
+    count = 0
+    for item1 in list1:
+        for item2 in list2:
+            count += calc_intersection_text(item1, item2)
+    return count
 
+def calc_intersection_text(text1, text2):
+    count = 0
+    text1 = str(text1)
+    text2 = str(text2)
+    for item1 in text1.split():
+        for item2 in text2.split():
+            if item1 == item2:
+                count += 1
+    return count
+
+
+def load_db():
+    import pathlib
+    path = pathlib.Path(db_fileName)
+    if path.exists():
+        with open(db_fileName, "r", encoding="UTF8") as file:
+            jsoncontent = file.read()
+        content = json.loads(jsoncontent)
+        return content
+    else:
+        return [{}]
+
+def find_book(text):
+    data_cl = load_db()
+    kw1 = get_keywords(text)
+    counts=3 # минимальное количество ключевых слов в тексте для нахождения нужной книги
+    find_data = []
+    for item in data_cl:
+        intersects = calc_intersection_list(kw1,item['keywords'])
+        item['intersects'] = intersects
+        find_data.append(item)
+    jsonstring = json.dumps(find_data, ensure_ascii=False)
+    with open("./find_data.json", "w", encoding="UTF8") as file:
+        file.write(jsonstring)
+    find_count_set=set()
+    for item in find_data:
+        find_count_set.add(item['intersects'])
+    # find_count_set=sorted(find_count_set, reverse=True)
+    find_max = max(find_count_set)
+    find_books = []
+    for item in find_data:
+        if item['intersects'] == find_max:
+            find_books.append(item)
+    jsonstring = json.dumps(find_books, ensure_ascii=False)
+    with open("./find_books.json", "w", encoding="UTF8") as file:
+        file.write(jsonstring)
+    return find_books    
+        
 if __name__ == '__main__':
     # nltk_download()
     str1="Роман-антиутопия рассказывает нам о том, как к 1984 году, в результате войн и политических кризисов на планете Земля, образовались три тоталитарных сверхдержавы: Океания, Евразия и Остазия – которые непрерывно воюют друг с другом. Действие происходит в будущем тоталитарном обществе, где правительство во главе с Большим Братом полностью контролирует все аспекты жизни граждан. Главный герой работает в Министерстве правды и начинает восставать против деспотичного режима правительства, но в итоге сталкивается с серьёзными последствиями своих действий."
     data = get_keywords(str1)
     print(data)
-
+    
+    data = find_book(str1)
+    print(data)

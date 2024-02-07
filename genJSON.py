@@ -1,13 +1,16 @@
 ﻿import json
 import npl_process
 
-if __name__ == '__main__':
-    db_fileName = "./data.txt"
+db_fileName_data = "./data.txt"
+db_fileName = "./data.json"
+
+def genJson():
+    
     import pathlib
-    path = pathlib.Path(db_fileName)
+    path = pathlib.Path(db_fileName_data)
     lines = []
     if path.exists():
-        with open(db_fileName, "r", encoding="UTF8") as file:
+        with open(db_fileName_data, "r", encoding="UTF8") as file:
             lines = file.readlines()
     count_lines = len(lines)
     # print(int(count_lines/4+1))
@@ -21,5 +24,8 @@ if __name__ == '__main__':
         line["keywords"] = npl_process.get_keywords(line["descr"])
         books.append(line)
     jsonstring = json.dumps(books, ensure_ascii=False)
-    with open("./data.json", "w", encoding="UTF8") as file:
+    with open(db_fileName, "w", encoding="UTF8") as file:
         file.write(jsonstring)
+
+if __name__ == '__main__':
+    genJson()
