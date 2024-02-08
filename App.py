@@ -16,6 +16,7 @@ def SendMessage():
     print(data)
     text = data['text']
     data = npl_process.find_book(text)
+    print(data)
     return data, 200
 
 
